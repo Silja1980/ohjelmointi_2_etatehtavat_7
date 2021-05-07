@@ -28,21 +28,39 @@ public class Asiakkaat extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("Asiakkaat.doGet()");
-		String pathInfo = request.getPathInfo();
-		System.out.println("polku: "+ pathInfo);
-		String hakusana="";
-		if (pathInfo!=null) {
-			hakusana = pathInfo.replace("/", "");
-		}
+		String pathInfo = request.getPathInfo();			
+		System.out.println("polku: "+pathInfo);		
 		Dao dao = new Dao();
-		ArrayList<Asiakas> asiakkaat = dao.listaaKaikki(hakusana);
-		System.out.println(asiakkaat);
-		String strJSON = new JSONObject().put("asiakkaat", asiakkaat).toString();	
+		ArrayList<Asiakas> asiakkaat;
+		String strJSON="";
+		if(pathInfo==null) { //Haetaan kaikki 
+			asiakkaat = dao.listaaKaikki();
+			strJSON = new JSONObject().put("asiakkaat", asiakkaat).toString();	
+		}else if(pathInfo.indexOf("haeyksi")!=-1) {		//polussa on sana "haeyksi", eli haetaan yhden tietueen tiedot
+			String ID = pathInfo.replace("/haeyksi/", ""); //poistetaan polusta "/haeyksi/", j‰ljelle j‰‰ rekno		
+			Asiakas asiakas = dao.etsiAsiakas(ID);
+			
+			if(asiakas==null) {
+				strJSON = "{}";
+			}else {						
+				JSONObject JSON = new JSONObject();
+				JSON.put("etunimi", asiakas.getEtunimi());
+				JSON.put("sukunimi", asiakas.getSukunimi());
+				JSON.put("puhelin", asiakas.getPuhelin());
+				JSON.put("sposti", asiakas.getSposti());
+				strJSON = JSON.toString();	
+			}
+		}else{ //Haetaan hakusanan mukaiset autot
+			String hakusana = pathInfo.replace("/", "");
+			asiakkaat = dao.listaaKaikki(hakusana);
+			strJSON = new JSONObject().put("asiakkaat", asiakkaat).toString();	
+		}	
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		out.println(strJSON);	
+		out.println(strJSON);		
 	}
 
+	
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("Asiakkaat.doPost()");
@@ -64,6 +82,21 @@ public class Asiakkaat extends HttpServlet {
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("Asiakkaat.doPut()");
+		JSONObject jsonObj = new JsonStrToObj().convert(request); //Muutetaan kutsun mukana tuleva json-string json-objektiksi			
+		String asiakas_id = jsonObj.getString("ID");
+		Asiakas asiakas = new Asiakas();
+		asiakas.setEtunimi(jsonObj.getString("etunimi"));
+		asiakas.setSukunimi(jsonObj.getString("sukunimi"));
+		asiakas.setPuhelin(jsonObj.getString("puhelin"));
+		asiakas.setSposti(jsonObj.getString("sposti"));
+		response.setContentType("application/json");
+		PrintWriter out = response.getWriter();
+		Dao dao = new Dao();			
+		if(dao.muutaAsiakas(asiakas, asiakas_id)){ //metodi palauttaa true/false
+			out.println("{\"response\":1}");  //Auton muuttaminen onnistui {"response":1}
+		}else{
+			out.println("{\"response\":0}");  //Auton muuttaminen ep‰onnistui {"response":0}
+		}		
 	}
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

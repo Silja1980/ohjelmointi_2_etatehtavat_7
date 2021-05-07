@@ -122,4 +122,49 @@ public class Dao {
 		}				
 		return paluuArvo;
 	}	
+	
+	public Asiakas etsiAsiakas(String ID) {
+		Asiakas asiakas = null;
+		sql = "SELECT * FROM asiakkaat WHERE asiakas_ID=?";       
+		try {
+			con=yhdista();
+			if(con!=null){ 
+				stmtPrep = con.prepareStatement(sql); 
+				stmtPrep.setString(1, ID);
+        		rs = stmtPrep.executeQuery();  
+        		if(rs.isBeforeFirst()){ //jos kysely tuotti dataa, eli rekNo on käytössä
+        			rs.next();
+        			asiakas = new Asiakas();   
+        			asiakas.setEtunimi(rs.getString(2));
+        			asiakas.setSukunimi(rs.getString(3));
+        			asiakas.setPuhelin(rs.getString(4));
+        			asiakas.setSposti(rs.getString(5));        		
+        		}        		
+			}	
+			con.close();  
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return asiakas;		
+	}
+	
+	public boolean muutaAsiakas(Asiakas asiakas, String ID){
+		boolean paluuArvo=true;
+		sql="UPDATE asiakkaat SET etunimi=?, sukunimi=?, puhelin=?, sposti=? WHERE asiakas_ID=?";						  
+		try {
+			con = yhdista();
+			stmtPrep=con.prepareStatement(sql); 
+			stmtPrep.setString(1, asiakas.getEtunimi());
+			stmtPrep.setString(2, asiakas.getSukunimi());
+			stmtPrep.setString(3, asiakas.getPuhelin());
+			stmtPrep.setString(4, asiakas.getSposti());
+			stmtPrep.setString(5, ID);
+			stmtPrep.executeUpdate();
+	        con.close();
+		} catch (Exception e) {				
+			e.printStackTrace();
+			paluuArvo=false;
+		}				
+		return paluuArvo;
+	}
 }

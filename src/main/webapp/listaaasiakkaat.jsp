@@ -62,6 +62,7 @@ function haeAsiakkaat(){
         	htmlStr+="<td>"+field.sukunimi+"</td>";
         	htmlStr+="<td>"+field.puhelin+"</td>";
         	htmlStr+="<td>"+field.sposti+"</td>"; 
+        	htmlStr+="<td><a href='muutaasiakas.jsp?ID="+field.ID+"'>Muuta</a>&nbsp;"; 
         	htmlStr+="<td><span class='poista' onclick=poista('"+field.ID+"')>Poista</span></td>";
         	htmlStr+="</tr>";
         	$("#listaus tbody").append(htmlStr);
@@ -76,7 +77,7 @@ function poista(ID, etunimi, sukunimi){
 	        }else if(result.response==1){
 	        	$("#rivi_"+ID).css("background-color", "red"); //V‰rj‰t‰‰n poistetun asiakkaan rivi
 	        	alert("Asiakkaan " + ID +" poisto onnistui.");
-				haeAutot();        	
+				haeAsiakkaat();        	
 			}
 	    }});
 	}
