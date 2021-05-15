@@ -38,19 +38,21 @@ public class Asiakkaat extends HttpServlet {
 			strJSON = new JSONObject().put("asiakkaat", asiakkaat).toString();	
 		}else if(pathInfo.indexOf("haeyksi")!=-1) {		//polussa on sana "haeyksi", eli haetaan yhden tietueen tiedot
 			String ID = pathInfo.replace("/haeyksi/", ""); //poistetaan polusta "/haeyksi/", j‰ljelle j‰‰ rekno		
+			System.out.println(ID);
 			Asiakas asiakas = dao.etsiAsiakas(ID);
 			
 			if(asiakas==null) {
 				strJSON = "{}";
 			}else {						
 				JSONObject JSON = new JSONObject();
+				JSON.put("ID", asiakas.getID());
 				JSON.put("etunimi", asiakas.getEtunimi());
 				JSON.put("sukunimi", asiakas.getSukunimi());
 				JSON.put("puhelin", asiakas.getPuhelin());
 				JSON.put("sposti", asiakas.getSposti());
 				strJSON = JSON.toString();	
 			}
-		}else{ //Haetaan hakusanan mukaiset autot
+		}else{ 
 			String hakusana = pathInfo.replace("/", "");
 			asiakkaat = dao.listaaKaikki(hakusana);
 			strJSON = new JSONObject().put("asiakkaat", asiakkaat).toString();	

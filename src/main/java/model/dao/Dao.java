@@ -132,9 +132,10 @@ public class Dao {
 				stmtPrep = con.prepareStatement(sql); 
 				stmtPrep.setString(1, ID);
         		rs = stmtPrep.executeQuery();  
-        		if(rs.isBeforeFirst()){ //jos kysely tuotti dataa, eli rekNo on käytössä
+        		if(rs.isBeforeFirst()){ 
         			rs.next();
         			asiakas = new Asiakas();   
+        			asiakas.setID(rs.getInt(1));
         			asiakas.setEtunimi(rs.getString(2));
         			asiakas.setSukunimi(rs.getString(3));
         			asiakas.setPuhelin(rs.getString(4));
